@@ -1,0 +1,179 @@
+:root {
+  /* HSL Color Tokens — dark default */
+  --bg-primary: hsl(224, 25%, 10%);
+  --bg-secondary: hsl(224, 20%, 15%);
+  --glass-bg: hsla(224, 25%, 16%, 0.65);
+  --glass-border: hsla(0, 0%, 100%, 0.08);
+  --glass-hover: hsla(0, 0%, 100%, 0.12);
+  --input-bg: hsla(224, 25%, 10%, 0.4);
+  --sidebar-bg: hsla(224, 25%, 10%, 0.4);
+  --modal-overlay: hsla(224, 30%, 5%, 0.75);
+  --modal-surface: hsla(224, 20%, 18%, 0.95);
+  --nav-active-bg: hsla(0, 0%, 100%, 0.08);
+  --scrollbar-thumb: hsla(0, 0%, 100%, 0.1);
+  --scrollbar-thumb-hover: hsla(0, 0%, 100%, 0.2);
+
+  --accent-purple: hsl(262, 83%, 65%);
+  --accent-cyan: hsl(190, 95%, 48%);
+  --accent-green: hsl(142, 70%, 45%);
+  --accent-yellow: hsl(48, 95%, 48%);
+  --accent-red: hsl(350, 89%, 60%);
+
+  --text-primary: hsl(0, 0%, 95%);
+  --text-secondary: hsl(220, 15%, 70%);
+  --text-muted: hsl(220, 10%, 50%);
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --border-radius-lg: 16px;
+  --border-radius-md: 10px;
+  --border-radius-sm: 6px;
+}
+
+[data-theme="light"] {
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #F1F5F9;
+  --glass-bg: hsla(0, 0%, 100%, 0.75);
+  --glass-border: hsla(220, 10%, 80%, 0.6);
+  --glass-hover: hsla(220, 10%, 70%, 0.15);
+  --input-bg: var(--bg-secondary);
+  --sidebar-bg: hsla(0, 0%, 100%, 0.6);
+  --modal-overlay: hsla(224, 20%, 20%, 0.45);
+  --modal-surface: hsla(0, 0%, 100%, 0.95);
+  --nav-active-bg: hsla(220, 15%, 50%, 0.1);
+  --scrollbar-thumb: hsla(220, 10%, 50%, 0.25);
+  --scrollbar-thumb-hover: hsla(220, 10%, 40%, 0.4);
+
+  --accent-purple: hsl(263, 55%, 45%);
+  --accent-cyan: hsl(190, 85%, 38%);
+  --accent-green: hsl(142, 60%, 35%);
+  --accent-yellow: hsl(48, 85%, 38%);
+  --accent-red: hsl(350, 75%, 48%);
+
+  --text-primary: hsl(224, 30%, 12%);
+  --text-secondary: hsl(224, 15%, 35%);
+  --text-muted: hsl(224, 10%, 55%);
+
+  --shadow-glow: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(262, 83%, 65%, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(190, 95%, 48%, 0.08) 0px, transparent 50%);
+  color: var(--text-primary);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+[data-theme="light"] body {
+  background-image:
+    radial-gradient(at 0% 0%, hsla(262, 83%, 65%, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(190, 95%, 48%, 0.05) 0px, transparent 50%);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Scrollbar styling for Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+/* Typography styles */
+h1, h2, h3, h4 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Glassmorphism panel styling helper class */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glow);
+  border-radius: var(--border-radius-lg);
+}
+
+[data-theme="light"] .glass-panel {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Transitions helper class */
+.interactive {
+  transition: var(--transition-smooth);
+}
+
+.interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  border-color: var(--glass-hover);
+}
+
+/* Spinners for Loading states */
+.spinner {
+  border: 3px solid hsla(0, 0%, 100%, 0.1);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border-left-color: var(--accent-cyan);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Context Menu */
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.context-menu-item:hover {
+  background-color: var(--glass-hover);
+}

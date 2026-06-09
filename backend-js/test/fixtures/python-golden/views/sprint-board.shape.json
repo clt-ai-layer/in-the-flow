@@ -1,0 +1,21 @@
+{
+  "requiredTopLevelKeys": ["grouped", "groups", "records", "visible_properties", "view_name", "layout_type"],
+  "exact": {
+    "view_name": "Sprint Board",
+    "layout_type": "board",
+    "grouped": true
+  },
+  "seedView": {
+    "id": "b2000001-0001-4000-8000-000000000001",
+    "database_id": "a1000002-0002-4000-8000-000000000002",
+    "name": "Sprint Board",
+    "layout_type": "board",
+    "grouping": { "group_by": "Status", "subgroup_by": "TaskGrouping" },
+    "filters": {
+      "operator": "and",
+      "rules": [{ "property": "Archived", "condition": "equals", "value": "false" }]
+    },
+    "sorts": [],
+    "visible_properties": ["Name", "Status", "Category", "Owner", "TaskGrouping", "Project", "Remaining Duration"]
+  }
+}

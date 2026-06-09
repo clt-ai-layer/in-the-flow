@@ -1,0 +1,76 @@
+{
+  "business": [
+    {
+      "name": "Define product roadmap for Q3",
+      "status": "in_progress",
+      "project": "Sample Project",
+      "category": "feature",
+      "source": "planning"
+    },
+    {
+      "name": "Draft user onboarding flow wireframes",
+      "status": "ready_to_start",
+      "project": "Sample Project",
+      "category": "feature",
+      "source": "planning"
+    },
+    {
+      "name": "Research competitor pricing models",
+      "status": "backlog",
+      "project": "Sample Project",
+      "category": "research",
+      "source": "planning"
+    },
+    {
+      "name": "Prepare investor pitch deck",
+      "status": "on_hold",
+      "project": "Sample Project",
+      "category": "feature",
+      "source": "planning"
+    },
+    {
+      "name": "Create marketing landing page copy",
+      "status": "done",
+      "project": "Sample Project",
+      "category": "improvement",
+      "source": "planning"
+    }
+  ],
+  "technical": [
+    {
+      "name": "Set up CI/CD pipeline with GitHub Actions",
+      "status": "in_progress",
+      "project": "Sample Project",
+      "category": "improvement",
+      "source": "planning"
+    },
+    {
+      "name": "Implement user authentication with OAuth2",
+      "status": "ready_to_start",
+      "project": "Sample Project",
+      "category": "feature",
+      "source": "planning"
+    },
+    {
+      "name": "Fix pagination bug on task list endpoint",
+      "status": "in_progress",
+      "project": "Sample Project",
+      "category": "bug",
+      "source": "planning"
+    },
+    {
+      "name": "Add database migration tooling for schema changes",
+      "status": "backlog",
+      "project": "Sample Project",
+      "category": "improvement",
+      "source": "planning"
+    },
+    {
+      "name": "Write integration tests for REST API endpoints",
+      "status": "ready_to_start",
+      "project": "Sample Project",
+      "category": "feature",
+      "source": "planning"
+    }
+  ]
+}

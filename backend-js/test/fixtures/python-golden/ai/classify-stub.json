@@ -1,0 +1,7 @@
+{
+  "category": "business",
+  "project_name": "My Project",
+  "estimated_duration": 60,
+  "confidence": 0.5,
+  "rationale": "Stub auto-classification (Gemini API key not configured)."
+}

@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+.kimi-api-key
+*.log
+_logs/
+.DS_Store

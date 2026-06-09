@@ -1,0 +1,48 @@
+{
+  "name": "Tasks Workspace",
+  "icon": "📋",
+  "properties": [
+    { "name": "Name", "type": "title" },
+    { "name": "Description", "type": "text" },
+    {
+      "name": "Status",
+      "type": "status",
+      "options": ["backlog", "ready_to_start", "in_progress", "on_hold", "done"]
+    },
+    { "name": "Category", "type": "select", "options": ["business", "dev"] },
+    {
+      "name": "Source",
+      "type": "select",
+      "options": ["user_created", "notion_arch", "planning"]
+    },
+    { "name": "Owner", "type": "select", "options": ["Alice", "Bob", "Shared"] },
+    {
+      "name": "TaskGrouping",
+      "type": "select",
+      "options": [
+        "AI",
+        "Infrastructure",
+        "Backend",
+        "Frontend",
+        "ZodValidator",
+        "Workflows",
+        "Distribution",
+        "ChatWidget",
+        "DemoStrategy",
+        "IcpDefinition",
+        "SocialMedia",
+        "ProductivityAgents",
+        "General"
+      ]
+    },
+    { "name": "Estimated Duration", "type": "number" },
+    { "name": "Current Duration", "type": "number" },
+    { "name": "Project", "type": "relation" },
+    { "name": "Archived", "type": "checkbox" },
+    {
+      "name": "Remaining Duration",
+      "type": "formula",
+      "formula_expression": "prop('Estimated Duration') - prop('Current Duration')"
+    }
+  ]
+}

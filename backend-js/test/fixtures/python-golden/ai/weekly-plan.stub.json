@@ -1,0 +1,20 @@
+{
+  "week_summary": "Weekly plan overview (Stub - Gemini key not configured).",
+  "priorities": [
+    {
+      "name": "Complete AI integration",
+      "category": "dev",
+      "project": "My Project"
+    }
+  ],
+  "suggested_calendar": [
+    {
+      "day": "Monday",
+      "tasks": ["Review task backlog"]
+    },
+    {
+      "day": "Wednesday",
+      "tasks": ["Perform business validation checks"]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "friction_score": 45,
+  "identified_blockers": [
+    {
+      "task_name": "Overdue feature",
+      "blocker_type": "estimation_exceeded",
+      "description": "Spent 120m, estimated 60m."
+    }
+  ],
+  "remediation_actions": ["Consider breaking down overdue tasks into smaller sub-tasks."],
+  "split_recommendations": [
+    {
+      "original_task": "Overdue feature",
+      "sub_tasks": [
+        "Part 1: Research Overdue feature",
+        "Part 2: Implement Overdue feature"
+      ]
+    }
+  ]
+}

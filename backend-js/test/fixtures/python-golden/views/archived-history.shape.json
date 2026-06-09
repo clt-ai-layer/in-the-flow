@@ -1,0 +1,21 @@
+{
+  "requiredTopLevelKeys": ["grouped", "records", "visible_properties", "view_name", "layout_type"],
+  "exact": {
+    "view_name": "Archived Tasks History",
+    "layout_type": "table",
+    "grouped": false
+  },
+  "seedView": {
+    "id": "b2000004-0004-4000-8000-000000000004",
+    "database_id": "a1000002-0002-4000-8000-000000000002",
+    "name": "Archived Tasks History",
+    "layout_type": "table",
+    "grouping": {},
+    "filters": {
+      "operator": "and",
+      "rules": [{ "property": "Archived", "condition": "equals", "value": "true" }]
+    },
+    "sorts": [],
+    "visible_properties": ["Name", "Status", "Category", "Owner", "TaskGrouping", "Project", "Remaining Duration"]
+  }
+}

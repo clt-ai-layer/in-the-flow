@@ -1,0 +1,3 @@
+# backend-js execute outputs
+
+Capture matching `POST /api/views/{id}/execute` from backend-js (using `seed/eav-ids.json` view UUIDs) for structural equivalence tests.

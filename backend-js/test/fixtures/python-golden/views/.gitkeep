@@ -1,0 +1,5 @@
+# Python golden execute outputs
+
+Capture `POST /api/views/{id}/execute` from Python backend with known seed into `{viewSlug}.json` files here.
+
+Used by plan 09 golden comparison tests.

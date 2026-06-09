@@ -1,0 +1,9 @@
+{
+  "name": "Projects Workspace",
+  "icon": "📁",
+  "properties": [
+    { "name": "Name", "type": "title" },
+    { "name": "Description", "type": "text" },
+    { "name": "Color", "type": "text" }
+  ]
+}

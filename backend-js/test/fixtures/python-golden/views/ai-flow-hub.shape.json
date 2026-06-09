@@ -1,0 +1,21 @@
+{
+  "requiredTopLevelKeys": ["grouped", "records", "visible_properties", "view_name", "layout_type"],
+  "exact": {
+    "view_name": "AI Flow Hub List",
+    "layout_type": "list",
+    "grouped": false
+  },
+  "seedView": {
+    "id": "b2000003-0003-4000-8000-000000000003",
+    "database_id": "a1000002-0002-4000-8000-000000000002",
+    "name": "AI Flow Hub List",
+    "layout_type": "list",
+    "grouping": {},
+    "filters": {
+      "operator": "and",
+      "rules": [{ "property": "Archived", "condition": "equals", "value": "false" }]
+    },
+    "sorts": [],
+    "visible_properties": ["Name", "Status", "Category", "Owner", "TaskGrouping", "Remaining Duration"]
+  }
+}

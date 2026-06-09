@@ -1,0 +1,40 @@
+{
+  "name": "@intheflow/backend-js",
+  "version": "2.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "InTheFlow desktop app backend — Emmett event sourcing on MongoDB",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/src/index.js",
+    "test": "vitest run",
+    "test:json": "vitest run --reporter=json",
+    "test:golden": "vitest run test/golden",
+    "seed": "tsx scripts/seed.ts"
+  },
+  "dependencies": {
+    "@event-driven-io/emmett": "0.42.3",
+    "@event-driven-io/emmett-expressjs": "0.42.3",
+    "@event-driven-io/emmett-mongodb": "0.42.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mongodb": "^6.12.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@testcontainers/mongodb": "^10.28.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.13.10",
+    "@types/supertest": "^6.0.2",
+    "mongodb-memory-server": "^10.4.1",
+    "sql.js": "^1.14.1",
+    "supertest": "^7.0.0",
+    "testcontainers": "^10.28.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.9"
+  }
+}
