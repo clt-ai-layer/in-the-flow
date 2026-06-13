@@ -1,9 +1,12 @@
+import { loadAppEnv } from "./platform/loadEnv.js";
 import { createApp } from "./platform/app.js";
 import { closeMongoResources, getEventStore } from "./platform/mongoConfig.js";
 import { runSeed } from "./platform/seedService.js";
 
 const HOST = "127.0.0.1";
 const PORT = 8000;
+
+loadAppEnv();
 
 /**
  * Boots the InTheFlow backend-js HTTP server.

@@ -45,6 +45,7 @@ Central orchestration in `frontend/src/App.jsx`:
 | `dailyTasksVersion` | number | Increment to refetch calendar |
 | `calendarAnchorDate` | string \| null | ISO date for calendar week anchor |
 | `showCreateViewModal` | bool | Custom view creation dialog |
+| `planningSyncEnabled` | bool | Whether sidebar sync button is visible (from `planning_sync_enabled` setting) |
 
 ### Key handlers
 
@@ -174,7 +175,7 @@ File: `frontend/src/utils/groupingColors.js`
 
 | Export | Purpose |
 | ------ | ------- |
-| `DEFAULT_GROUPING_COLORS` | Curated hex values (AI, Backend, Project Management, …) |
+| `DEFAULT_GROUPING_COLORS` | 22 curated hex values (AI, Backend, API, Auth, Catalog, InTheFlow, SocialMedia, … General) |
 | `resolveGroupingColors(storedJson)` | Merge user overrides from settings |
 | `getTaskGrouping(taskOrRecord)` | Normalize `task_grouping` or EAV `TaskGrouping` |
 | `getGroupingColor(grouping, map)` | Lookup with hash fallback |

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolveMongoKeyPath } from "./pathUtils.js";
 
 const SETUP_MESSAGE =
-  "MongoDB connection not configured. Set MONGODB_URI, or create " +
+  "MongoDB connection not configured. Set MONGODB_URI (or MONGO_URI), or create " +
   "Documentation/3-Development/InTheFlow/JsBackend/.mongo-key with your connection string. " +
   "See InTheFlow/backend-js/README.md for setup instructions.";
 
@@ -13,7 +13,8 @@ const SETUP_MESSAGE =
  * @throws Error When no URI can be resolved.
  */
 export function resolveMongoUri(): string {
-  const envUri = process.env.MONGODB_URI?.trim();
+  const envUri =
+    process.env.MONGODB_URI?.trim() || process.env.MONGO_URI?.trim();
   if (envUri) {
     return envUri;
   }

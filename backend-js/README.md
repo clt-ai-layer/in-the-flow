@@ -49,9 +49,16 @@ Server listens on **http://127.0.0.1:8000** (same port as Python for drop-in com
 
 Run only one backend on port 8000 at a time.
 
-### Kimi API key
+### AI provider
 
-Paste your Moonshot API key in **Settings → Google Gemini API Key** (`gemini_api_key` — legacy UI label). Resolution order also accepts `kimi_api_key`, env `KIMI_API_KEY` / `GEMINI_API_KEY`, or a `.kimi-api-key` file in this directory.
+Set `AI_PROVIDER` to `kimi` (default) or `gemini`. Optional `AI_MODEL` overrides the provider default (`kimi-k2.6` / `gemini-2.0-flash`).
+
+| Provider | Env key | Key file fallback |
+| -------- | ------- | ----------------- |
+| Kimi | `KIMI_API_KEY` | `backend-js/.kimi-api-key` |
+| Gemini | `GEMINI_API_KEY` | `backend-js/.gemini-api-key` |
+
+Settings UI still labels the key field "Google Gemini API Key" (`gemini_api_key`); when `AI_PROVIDER=kimi`, that value is treated as a Kimi key (legacy). Use `kimi_api_key` or `KIMI_API_KEY` for Kimi explicitly.
 
 ### AI routes
 

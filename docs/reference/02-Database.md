@@ -1,7 +1,7 @@
 # InTheFlow — Database Schema
 
 > **Type**: Reference (live code truth)  
-> **Source**: `backend/database.py` (Python legacy) · `backend-js/` (MongoDB primary)  
+> **Source**: `backend-js/` (MongoDB + Emmett)  
 > **Last Updated**: 2026-05-25
 
 ## backend-js persistence (MongoDB + Emmett)
@@ -14,118 +14,13 @@ Primary persistence for post-cutover development. Source: `backend-js/`.
 | Database names | `intheflow_dev` (local), `intheflow_test` (Vitest), override `MONGODB_DB_NAME` |
 | Stream pattern | One stream per entity — e.g. `task:{uuid}`, `project:{uuid}`, `dailyTask:{uuid}` |
 | Read models | Inline projections on each stream (task list, daily task doc, EAV records, views) |
-| Cross-stream sync | `taskSideEffects` / `projectSideEffects` — awaited `handle()` before HTTP response |
+| Cross-stream sync | `TaskIntegrationHandler` / `projectSideEffects` — awaited `handle()` before HTTP response |
 | Seed | Idempotent `registerSeedPhase()` hooks; JSON assets in `backend-js/seed/` |
 | Credentials | `MONGODB_URI` → `.mongo-key` → `MONGO_KEY_PATH` |
 
-Entity shapes mirror the Python SQLModel tables below for API compatibility. **No SQLite import in v1** — see ADR-001 in [07-Known-Limitations.md](07-Known-Limitations.md).
+Entity shapes below document the field definitions for API compatibility. **No SQLite import in v1** — see ADR-001 in [07-Known-Limitations.md](07-Known-Limitations.md).
 
 ---
-
-## Python legacy (SQLite)
-
-> **Source**: `backend/database.py`
-
-## Engine Configuration
-
-| Setting | Value |
-| ------- | ----- |
-| Engine | SQLite via SQLModel |
-| File | `backend/intheflow.db` |
-| URL | `sqlite:///intheflow.db` |
-| Journal mode | WAL (`PRAGMA journal_mode=WAL`) |
-| Thread safety | `check_same_thread=False` |
-
-Session factory: `get_session()` — FastAPI dependency yielding a `Session`.
-
-## Entity Relationship Diagram
-
-```mermaid
-erDiagram
-    Project ||--o{ Task : "project_id"
-    Task ||--o{ DailyTask : "task_id"
-    Database ||--o{ DatabaseRecord : "database_id"
-    Database ||--o{ DatabaseView : "database_id"
-    DatabaseRecord }o--|| Database : "database_id"
-
-    Project {
-        string id PK
-        string name UK
-        string description
-        string color
-        datetime created_at
-    }
-
-    Task {
-        string id PK
-        string name
-        string status
-        string category
-        string source
-        string owner
-        string task_grouping
-        bool archived
-        int estimated_duration
-        int current_duration
-        string project_id FK
-        datetime created_at
-        datetime updated_at
-    }
-
-    DailyTask {
-        string id PK
-        string task_id FK
-        string date
-        string start_time
-        string end_time
-        string title
-        datetime created_at
-        datetime updated_at
-    }
-
-    Setting {
-        string key PK
-        string value
-        datetime updated_at
-    }
-
-    AiLog {
-        string id PK
-        string action
-        string prompt
-        string response
-        int tokens_used
-        datetime created_at
-    }
-
-    Database {
-        string id PK
-        string name UK
-        string icon
-        string properties
-        datetime created_at
-    }
-
-    DatabaseRecord {
-        string id PK
-        string database_id FK
-        string property_values
-        datetime created_at
-        datetime updated_at
-    }
-
-    DatabaseView {
-        string id PK
-        string database_id FK
-        string name
-        string layout_type
-        string filters
-        string sorts
-        string grouping
-        string visible_properties
-        datetime created_at
-    }
-```
 
 ## Tables
 
@@ -187,7 +82,7 @@ Calendar schedule blocks. Distinct from sprint `Task` tickets.
 | `created_at` | `datetime` | UTC now | |
 | `updated_at` | `datetime` | UTC now | |
 
-**Cascade behavior**: Deleting a parent `Task` explicitly deletes linked `DailyTask` rows (SQLite FK not enforced).
+**Cascade behavior**: Deleting a parent `Task` explicitly deletes linked `DailyTask` rows (application-level cascade).
 
 ### Setting
 
@@ -254,19 +149,18 @@ Saved view configurations for the query engine.
 
 ## Seeding
 
-`seed_database(session)` runs on every startup (idempotent):
+Seed phases run on every startup (idempotent) via `registerSeedPhase()` hooks:
 
 ### 1. Default projects
 
-```python
-DEFAULT_PROJECTS = [
-    {"name": "Sample Project", "color": "#3B82F6", "description": "Production DDD/CQRS/Event Sourcing platform"}
-]
+```typescript
+// Default project seeded on first run
+{ name: "Sample Project", color: "#3B82F6", description: "Production DDD/CQRS/Event Sourcing platform" }
 ```
 
 ### 2. Tasks from JSON
 
-If `Task` count is zero, loads `backend/seed_tasks.json`:
+If no tasks exist, loads `backend-js/seed/seed_tasks.json`:
 
 - `business[]` — category `business`
 - `technical[]` — category `dev`
@@ -280,7 +174,7 @@ If `Database` count is zero:
 1. Creates **Projects Workspace** database (Name, Description, Color)
 2. Creates **Tasks Workspace** database (full task property schema)
 3. Migrates existing Project/Task rows to DatabaseRecords (IDs preserved)
-4. Seeds four default DatabaseViews (Sprint Board with `subgroup_by: null` in Python — **backend-js uses `subgroup_by: "TaskGrouping"`**)
+4. Seeds four default DatabaseViews (Sprint Board with `subgroup_by: "TaskGrouping"`)
 
 ### backend-js seeding (primary)
 
@@ -297,31 +191,7 @@ Startup seed phases in `backend-js/src/` (import order):
 
 **Sprint Board grouping (backend-js):** `{ group_by: "Status", subgroup_by: "TaskGrouping" }`
 
-Manual EAV rebuild: `pnpm backfill:task-records` (purges orphan EAV rows, re-upserts from task projections).
-
-## sync_task_to_record (Python legacy)
-
-```python
-def sync_task_to_record(session: Session, task: Task)
-```
-
-Ensures every legacy `Task` has a matching `DatabaseRecord` in "Tasks Workspace":
-
-| Task field | EAV property |
-| ---------- | ------------ |
-| `name` | Name |
-| `description` | Description |
-| `status` | Status |
-| `category` | Category |
-| `source` | Source |
-| `owner` | Owner |
-| `task_grouping` | TaskGrouping |
-| `estimated_duration` | Estimated Duration |
-| `current_duration` | Current Duration |
-| `project_id` | Project (as `[id]` relation array) |
-| `archived` | Archived |
-
-Called after task create/update in `tasks.py` router and during weekly plan sync.
+Manual EAV rebuild: run `backend-js/scripts/backfill-task-records.ts` (purges orphan EAV rows, re-upserts from task projections).
 
 ## Tasks Workspace property schema (seeded)
 
@@ -333,7 +203,7 @@ Called after task create/update in `tasks.py` router and during weekly plan sync
 | Category | select | business, dev |
 | Source | select | user_created, notion_arch, planning |
 | Owner | select | Alice, Bob, Shared |
-| TaskGrouping | select | AI, Access Control, Backend, … General |
+| TaskGrouping | select | AI, Access Control, API, Auth, Backend, … General (22 defaults) |
 | Estimated Duration | number | |
 | Current Duration | number | |
 | Project | relation | → Projects Workspace |

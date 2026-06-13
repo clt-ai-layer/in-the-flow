@@ -1,25 +1,39 @@
 # InTheFlow — AI Capabilities
 
 > **Type**: Reference (live code truth)  
-> **Primary service**: `backend-js/src/ai/KimiService.ts`  
-> **Primary router**: `backend-js/src/ai/api/routes.ts`  
-> **Legacy**: `backend/services/gemini_service.py`, `routers/ai.py`  
+> **Services**: `backend-js/src/ai/KimiService.ts`, `backend-js/src/ai/GeminiService.ts`  
+> **Config**: `backend-js/src/ai/aiConfig.ts` — `createAiService()` factory  
+> **Router**: `backend-js/src/ai/routes.ts`  
 > **Last Updated**: 2026-05-25
 
 ## Overview
 
-InTheFlow integrates **Moonshot Kimi** for task intelligence (replacing Google Gemini in backend-js). The backend wraps the Moonshot API in `KimiService`; the frontend calls REST endpoints via `api.ai.*` in `frontend/src/api.js`.
+InTheFlow uses a **multi-provider AI architecture** for task intelligence. The default provider is **Moonshot Kimi**; **Google Gemini** (`gemini-2.0-flash`) is available as an alternative. The active provider is selected via `AI_PROVIDER` env or `ai_provider` setting (default: `kimi`). The backend uses `createAiService()` to instantiate the appropriate service; the frontend calls REST endpoints via `api.ai.*` in `frontend/src/api.js`.
 
 ```mermaid
 flowchart LR
     UI[React UI] --> API["/api/ai/*"]
-    API --> KS[KimiService]
+    API --> Factory[createAiService]
+    Factory -->|ai_provider=kimi| KS[KimiService]
+    Factory -->|ai_provider=gemini| GS[GeminiService]
     KS --> Kimi[Moonshot Kimi API]
+    GS --> Gemini[Google Gemini API]
     API --> Log[(AiLog collection)]
-    API --> Settings[(Setting: gemini_api_key)]
+    API --> Settings[(Setting: ai_provider, gemini_api_key)]
 ```
 
 ## Configuration
+
+### Provider selection
+
+| Source | Key | Values |
+| ------ | --- | ------ |
+| Settings DB | `ai_provider` | `kimi` (default), `gemini` |
+| Environment | `AI_PROVIDER` | Override setting |
+
+Settings UI: **Settings → AI Provider** selector.
+
+### Kimi key resolution
 
 | Source | Key | Priority |
 | ------ | --- | -------- |
@@ -28,15 +42,24 @@ flowchart LR
 | Environment | `KIMI_API_KEY` / `GEMINI_API_KEY` | Fallback |
 | File | `backend-js/.kimi-api-key` | Local dev (gitignored) |
 
-Settings UI: **Settings → Google Gemini API Key** (password field, saved via POST `/api/settings`).
+### Gemini key resolution
 
-### Model
+| Source | Key | Priority |
+| ------ | --- | -------- |
+| Settings DB | `gemini_api_key` | Primary |
+| Environment | `GEMINI_API_KEY` | Fallback |
+| File | `backend-js/.gemini-api-key` | Local dev (gitignored) |
 
-| Setting | Value |
-| ------- | ----- |
-| Provider | Moonshot Kimi |
-| Model | `kimi-k2.6` (override via `KIMI_MODEL` env) |
-| Response format | JSON |
+### Models
+
+| Provider | Default model | Override env |
+| -------- | ------------- | ------------ |
+| Kimi | `kimi-k2.6` | `KIMI_MODEL` |
+| Gemini | `gemini-2.0-flash` | `GEMINI_MODEL` |
+
+Universal override: `AI_MODEL` env applies to whichever provider is active.
+
+Response format: JSON (both providers).
 
 ### Stub mode
 
@@ -136,7 +159,7 @@ Context loaded from planning files whose names contain `mvp`, `week`, or `planni
 
 **Purpose**: AI fallback parser for weekly plan sync (not exposed as REST endpoint).
 
-**Called by**: `sync_service.sync_weekly_plan()` when regex parser returns zero tasks (Python). backend-js uses the same fallback via `KimiService.parseWeeklyPlanAi()`.
+**Called by**: `syncService.syncWeeklyPlan()` when regex parser returns zero tasks. Uses the active AI provider's `parseWeeklyPlanAi()` method.
 
 **Output schema**:
 
@@ -156,7 +179,7 @@ Context loaded from planning files whose names contain `mvp`, `week`, or `planni
 
 ## Weekly Plan Sync (Markdown Import)
 
-File: `backend/services/sync_service.py`  
+File: `backend-js/src/settings/syncPlanning/syncService.ts`  
 Trigger: Sidebar **Sync Weekly Plan** → POST `/api/settings/sync-planning`
 
 This is **separate from** the AI weekly-plan compiler — it deterministically imports tasks into the database.
@@ -182,8 +205,8 @@ Parses checklist lines under `### Week:` section:
 | `[ ]` | status `backlog` |
 | `[/]` | status `in_progress` |
 | `[x]` / `[X]` | status `done` |
-| 👤 | owner `Alice` |
-| 👥 | owner `Bob` |
+| Ⓑ | owner `Alice` |
+| 🅾️ | owner `Bob` |
 | 🤝 | owner `Shared` |
 | `#### 💻 Development` header | category `dev` |
 | Other `####` headers | category `business` |
@@ -239,6 +262,6 @@ Frontend displays alert with file name, parser mode, and counts.
 
 ## Audit Logs
 
-Query manually via `backend/read_ai_logs.py` or direct SQLite access to `ailog` table.
+AI logs are stored in the MongoDB `ai_logs` collection.
 
-Each log captures: action name, prompt summary, response string, timestamp.
+Each log captures: action name, prompt summary, response string, token count, model used, timestamp.

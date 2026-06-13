@@ -23,5 +23,8 @@
     "@vitejs/plugin-react": "^4.2.0",
     "electron": "^27.1.2",
     "vite": "^5.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["electron", "esbuild"]
   }
 }

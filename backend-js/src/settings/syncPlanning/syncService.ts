@@ -19,7 +19,7 @@ import {
   type SettingsDocument,
 } from "@/settings/projections/settingsProjection.js";
 import { Settings } from "@/settings/domain/Settings.js";
-import { getKimiApiKey } from "@/ai/keyResolution.js";
+import { isAiConfigured } from "@/ai/keyResolution.js";
 import {
   DEFAULT_PLANNING_DIR,
   PLANNING_FOLDER_SETTING_KEY,
@@ -316,11 +316,10 @@ export async function syncWeeklyPlan(
   let parserMode: "regex" | "ai" = "regex";
 
   if (parsedTasks.length === 0) {
-    const apiKey = getKimiApiKey(settings);
-    if (apiKey) {
+    if (isAiConfigured(settings)) {
       try {
         const { parseWeeklyPlanAi } = await import("@/ai/syncPlanning/parseWeeklyPlanAi.js");
-        const aiResult = await parseWeeklyPlanAi(fileContent, apiKey);
+        const aiResult = await parseWeeklyPlanAi(fileContent, settings);
         parsedTasks = aiResult.tasks ?? [];
         if (parsedTasks.length > 0) {
           parserMode = "ai";

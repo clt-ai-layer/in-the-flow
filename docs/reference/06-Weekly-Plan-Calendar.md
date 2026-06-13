@@ -53,7 +53,7 @@ See [02-Database.md](02-Database.md#dailytask) for schema.
 
 ### Materialized parent fields (backend-js)
 
-API responses include `parent_task_name`, `parent_task_grouping`, `parent_project_id`, `parent_status`, and `parent_archived`. In Python these come from a SQL LEFT JOIN at read time. In **backend-js**, fields are stored on the DailyTask projection and updated via Emmett `handle()` when the parent task changes (`taskSideEffects.syncDailyTaskParentFields` in `backend-js/src/integration/taskSideEffects.ts`).
+API responses include `parent_task_name`, `parent_task_grouping`, `parent_project_id`, `parent_status`, and `parent_archived`. Fields are stored on the DailyTask projection and updated via Emmett `handle()` when the parent task changes (`TaskIntegrationHandler` in `backend-js/src/task/integration/TaskIntegrationHandler.ts`).
 
 ## Calendar Grid UX
 
@@ -134,7 +134,7 @@ Files: `frontend/src/utils/groupingColors.js`, `frontend/src/pages/Settings.jsx`
 
 ### Defaults
 
-12 curated colors in `DEFAULT_GROUPING_COLORS` (AI, Backend, General, etc.).
+22 curated colors in `DEFAULT_GROUPING_COLORS` (AI, Backend, API, Auth, Catalog, InTheFlow, SocialMedia, … General).
 
 ### User overrides
 
@@ -157,12 +157,7 @@ Settings → **Task Grouping Colors** editor:
 
 After wiping Mongo task streams, also clear or backfill `database_records`:
 
-```powershell
-cd backend-js
-pnpm backfill:task-records
-```
-
-Weekly plan CLI: `python .cursor/skills/weekly-planning-assistant/seeds/seed_may26_clean.py` (creates tasks, daily blocks, runs backfill).
+Run the EAV backfill script: `backend-js/scripts/backfill-task-records.ts` (purges orphan EAV rows, re-upserts from task projections).
 
 ## Theme Toggle
 
@@ -193,7 +188,7 @@ Reference: Feature success criteria documentation.
 | 8 | TaskModal Add to calendar | `handleSaveAddForm` |
 | 9 | Row click navigates to week | `handleBlockRowClick` → `calendarAnchorDate` |
 | 10 | Linked block opens TaskModal | `handleBlockClick` → `api.tasks.get` |
-| 11 | Task delete cascades daily tasks | `tasks.py` / `taskSideEffects.onTaskDeleted` |
+| 11 | Task delete cascades daily tasks | `TaskIntegrationHandler` (cascade delete) |
 | 12 | Failed PATCH reverts + toast | `persistBlockUpdate` |
 | 13 | 422 on invalid schedule | `validate_schedule()` |
 | 14 | Untitled + neutral accent | `getBlockTitle`, `getDailyBlockAccentColor` |
@@ -230,10 +225,9 @@ From success criteria section 5:
 
 | Area | Path |
 | ---- | ---- |
-| DailyTask model | `backend/database.py` (Python) / `backend-js/src/dailyTask/` (Emmett) |
-| Daily tasks API | `backend/routers/daily_tasks.py` / `backend-js/src/dailyTask/api/routes.ts` |
-| Parent field sync | - / `backend-js/src/integration/taskSideEffects.ts` |
-| Task cascade delete | `backend/routers/tasks.py` / `taskSideEffects.onTaskDeleted` |
+| DailyTask model | `backend-js/src/dailyTask/` (Emmett aggregate) |
+| Daily tasks API | `backend-js/src/dailyTask/api/routes.ts` |
+| Task integration handler | `backend-js/src/task/integration/TaskIntegrationHandler.ts` |
 | Calendar page | `frontend/src/pages/Calendar.jsx` |
 | TaskModal linking | `frontend/src/components/TaskModal.jsx` |
 | App orchestration | `frontend/src/App.jsx` |

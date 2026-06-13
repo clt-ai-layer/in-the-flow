@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { AiLogDocument } from "@/ai/AiLogRepository.js";
+import { getAiProvider, getApiKey } from "@/ai/aiConfig.js";
 import { tryGetMongoClient } from "@/platform/mongoConfig.js";
 import { findBackendJsRoot } from "@/platform/pathUtils.js";
 import { getDatabaseName } from "@/platform/mongoUri.js";
@@ -8,6 +9,7 @@ import { getDatabaseName } from "@/platform/mongoUri.js";
 const AI_LOGS_COLLECTION = "ai_logs";
 
 const KIMI_KEY_FILENAME = ".kimi-api-key";
+const GEMINI_KEY_FILENAME = ".gemini-api-key";
 
 /**
  * Resolves `backend-js/.kimi-api-key` (first non-empty line).
@@ -22,27 +24,39 @@ export function resolveKimiKeyPath(): string | null {
   return existsSync(path) ? path : null;
 }
 
-/**
- * True when `KIMI_API_KEY`, `GEMINI_API_KEY`, or `.kimi-api-key` is available.
- */
-export function hasApiKey(): boolean {
-  const envKey =
-    process.env.KIMI_API_KEY?.trim() || process.env.GEMINI_API_KEY?.trim();
-  if (envKey) {
-    return true;
+function readKeyFile(filename: string): string | undefined {
+  const root = findBackendJsRoot();
+  if (!root) {
+    return undefined;
   }
 
-  const path = resolveKimiKeyPath();
-  if (!path) {
-    return false;
+  const path = join(root, filename);
+  if (!existsSync(path)) {
+    return undefined;
   }
 
   const line = readFileSync(path, "utf-8").split("\n")[0]?.trim();
-  return !!line;
+  return line || undefined;
 }
 
 /**
- * Live Kimi integration tests run only when explicitly gated.
+ * True when the active provider has an API key from env or key file.
+ */
+export function hasApiKey(): boolean {
+  const provider = getAiProvider();
+  if (getApiKey(provider)) {
+    return true;
+  }
+
+  if (provider === "kimi") {
+    return !!readKeyFile(KIMI_KEY_FILENAME);
+  }
+
+  return !!readKeyFile(GEMINI_KEY_FILENAME);
+}
+
+/**
+ * Live AI integration tests run only when explicitly gated.
  */
 export function shouldRunAiIntegration(): boolean {
   return process.env.RUN_INTHEFLOW_AI_TESTS === "true" && hasApiKey();

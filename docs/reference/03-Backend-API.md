@@ -10,7 +10,6 @@
 | Stack | GET `/` version | Entry |
 | ----- | --------------- | ----- |
 | **backend-js** (Emmett) | `"version": "2.0.0"` | `backend-js/src/index.ts` |
-| Python FastAPI (legacy) | No version marker | `backend/main.py` |
 
 When health returns version **2.0.0**, the Emmett-backed Node service is running. Router paths and the `{ detail }` error format are unchanged for `api.js` compatibility.
 
@@ -22,14 +21,14 @@ When health returns version **2.0.0**, the Emmett-backed Node service is running
 
 ## Router Summary
 
-| Router | Prefix | Python file | backend-js module |
-| ------ | ------ | ----------- | ----------------- |
-| Tasks | `/api/tasks` | `backend/routers/tasks.py` | `backend-js/src/task/` |
-| Daily Tasks | `/api/daily-tasks` | `backend/routers/daily_tasks.py` | `backend-js/src/dailyTask/` |
-| Projects | `/api/projects` | `backend/routers/projects.py` | `backend-js/src/project/` |
-| Settings | `/api/settings` | `backend/routers/settings.py` | `backend-js/src/settings/` |
-| AI | `/api/ai` | `backend/routers/ai.py` | `backend-js/src/ai/` |
-| Views | `/api/views` | `backend/routers/views.py` | `backend-js/src/views/` |
+| Router | Prefix | Module |
+| ------ | ------ | ------ |
+| Tasks | `/api/tasks` | `backend-js/src/task/` |
+| Daily Tasks | `/api/daily-tasks` | `backend-js/src/dailyTask/` |
+| Projects | `/api/projects` | `backend-js/src/project/` |
+| Settings | `/api/settings` | `backend-js/src/settings/` |
+| AI | `/api/ai` | `backend-js/src/ai/` |
+| Views | `/api/views` | `backend-js/src/views/` |
 
 ---
 
@@ -59,14 +58,14 @@ List tasks with optional filters.
 Create task. Body: full `Task` model (id auto-generated).
 
 **Response**: 201 + `Task`  
-**Side effect**: `sync_task_to_record()`
+**Side effect**: `TaskIntegrationHandler` syncs EAV record
 
 ### PUT `/api/tasks/{task_id}`
 
 Full update. Excludes `id`, `created_at` from copy.
 
 **Response**: `Task`  
-**Side effect**: `sync_task_to_record()`
+**Side effect**: `TaskIntegrationHandler` syncs EAV record
 
 ### DELETE `/api/tasks/{task_id}`
 
@@ -251,8 +250,11 @@ Trigger weekly plan markdown sync.
 
 | Key | Format | Purpose |
 | --- | ------ | ------- |
-| `gemini_api_key` | string | Google Gemini API key (also accepts legacy `GEMINI_API_KEY`) |
+| `gemini_api_key` | string | Legacy naming — stores the API key for whichever AI provider is active (Kimi or Gemini) |
+| `kimi_api_key` | string | Kimi-specific API key (primary for Kimi provider) |
+| `ai_provider` | `kimi` \| `gemini` | Active AI provider (default: `kimi`; override via `AI_PROVIDER` env) |
 | `planning_folder_path` | string | Folder scanned by AI endpoints; default `""` (user-configurable) |
+| `planning_sync_enabled` | `true` \| `false` | Enables in-app weekly plan sync button in sidebar |
 | `sync_active_file_hash` | JSON string | `{"file_name": "...", "hash": "sha256..."}` — dedup for weekly sync |
 | `theme` | `light` \| `dark` | Persisted appearance preference |
 | `task_grouping_colors` | JSON string | Map of grouping name → `#RRGGBB` hex overrides |
@@ -261,7 +263,7 @@ Trigger weekly plan markdown sync.
 
 ## AI (`/api/ai`)
 
-All endpoints require Gemini key in settings or env for live responses. Without key, stub fallbacks apply (see [05-AI-Capabilities.md](05-AI-Capabilities.md)).
+All endpoints require an AI provider API key (Kimi default, Gemini alternative) in settings or env for live responses. Without key, stub fallbacks apply (see [05-AI-Capabilities.md](05-AI-Capabilities.md)).
 
 ### POST `/api/ai/classify`
 
@@ -370,7 +372,7 @@ Update filters, sorts, grouping, visible_properties only.
 
 ### POST `/api/views/{view_id}/execute`
 
-Runs `executeView()` (backend-js) / `QueryEngine.execute_view()` (Python).
+Runs `executeView()` via the QueryEngine.
 
 **Response:** Query result — structure depends on view config.
 
@@ -405,7 +407,7 @@ EAV fields use **PascalCase** (`TaskGrouping`, not `task_grouping`). No fallback
 
 ## Error Format
 
-Unchanged across Python and backend-js — FastAPI-compatible:
+FastAPI-compatible format:
 
 ```json
 { "detail": "Error message string" }

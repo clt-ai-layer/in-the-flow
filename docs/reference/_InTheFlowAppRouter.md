@@ -6,7 +6,7 @@
 
 ## What This Is
 
-InTheFlow is a **standalone desktop productivity workspace** (Electron + React + **backend-js** on MongoDB). A **legacy Python/FastAPI + SQLite** stack remains under `backend/` for parity testing. This router indexes **reference documentation** that describes live code.
+InTheFlow is a **standalone desktop productivity workspace** (Electron + React + **backend-js** on MongoDB). This router indexes **reference documentation** that describes live code.
 
 ## Responsibilities
 
@@ -19,7 +19,6 @@ InTheFlow is a **standalone desktop productivity workspace** (Electron + React +
 | Location | Purpose |
 | -------- | ------- |
 | **This folder** (numbered `00`–`07` docs) | Authoritative documentation of **live code today** |
-| **[Specs/](Specs/)** | Historical planning-era specifications; preserved, not overwritten |
 
 ## Quick Navigation
 
@@ -29,18 +28,12 @@ InTheFlow is a **standalone desktop productivity workspace** (Electron + React +
 | --- | ----- |
 | [00-Overview.md](00-Overview.md) | What InTheFlow is, how to run, directory layout, capabilities |
 | [01-Architecture.md](01-Architecture.md) | Electron + backend-js startup, IPC, navigation, EAV dual-write |
-| [02-Database.md](02-Database.md) | Mongo event streams + EAV; legacy SQLite models |
+| [02-Database.md](02-Database.md) | Mongo event streams + EAV schema |
 | [03-Backend-API.md](03-Backend-API.md) | All REST routers, endpoints, settings keys |
 | [04-Frontend.md](04-Frontend.md) | Pages, App state, api.js, Kanban swimlanes, CSS tokens |
-| [05-AI-Capabilities.md](05-AI-Capabilities.md) | Kimi integration, weekly plan sync |
+| [05-AI-Capabilities.md](05-AI-Capabilities.md) | Multi-provider AI (Kimi default, Gemini), weekly plan sync |
 | [06-Weekly-Plan-Calendar.md](06-Weekly-Plan-Calendar.md) | DailyTask, calendar UX, grouping colors, theme |
 | [07-Known-Limitations.md](07-Known-Limitations.md) | v1 deferrals, doc drift, light-mode gaps |
-
-### Historical Specs
-
-| Folder | Purpose |
-| ------ | ------- |
-| [Specs/](Specs/) | Planning-era specs (00-Summary through 07-Enhanced-Notion-DB-Spec) |
 
 ## Key Source Paths
 
@@ -48,10 +41,10 @@ InTheFlow is a **standalone desktop productivity workspace** (Electron + React +
 | ---- | ---- |
 | App root | `.` |
 | **Primary backend** | `backend-js/src/index.ts` |
-| Task → EAV sync | `backend-js/src/integration/taskSideEffects.ts` |
+| Task → EAV sync | `backend-js/src/task/integration/TaskIntegrationHandler.ts` |
 | Query engine | `backend-js/src/views/queryEngine/QueryEngine.ts` |
 | View seed (Sprint Board subgroups) | `backend-js/src/views/seed/registerViewsSeed.ts` |
-| Legacy backend | `backend/main.py`, `database.py`, `routers/` |
+| ES-kit / event sourcing | `backend-js/es-kit/` |
 | React app | `frontend/src/App.jsx` |
 | HTTP client | `frontend/src/api.js` |
 | Electron main | `frontend/electron.js` |
@@ -65,8 +58,7 @@ InTheFlow is a **standalone desktop productivity workspace** (Electron + React +
 | UI | React 18, Vite 5, Lucide icons |
 | API | Express, Emmett, TypeScript |
 | Database | MongoDB (event streams + `database_records` EAV) |
-| AI | Moonshot Kimi (`KimiService.ts`) |
-| Legacy API | FastAPI, SQLModel, SQLite (`backend/`) |
+| AI | Multi-provider: Kimi (default) + Gemini — `createAiService()` |
 
 ---
 

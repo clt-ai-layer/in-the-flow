@@ -39,25 +39,24 @@ This document records **intentional v1 deferrals**, **documentation drift**, and
 | Limitation | Detail |
 | ---------- | ------ |
 | Stub mode without key | All AI endpoints return heuristic stubs (HTTP 200) when Kimi key missing |
-| Token tracking | Python `AiLog.tokens_used` often 0; backend-js populates when live |
-| Planning path hardcoded | `sync_service.PLANNING_DIR` is hardcoded; AI endpoints use setting with same default |
+| Token tracking | `AiLog.tokens_used` may be 0 in stub mode; populated when AI provider is live |
+| Planning path configurable | Planning folder path is configurable via `planning_folder_path` setting and Settings UI |
 | No classify UI | `/api/ai/classify` exists but no dedicated frontend workflow |
 | Legacy settings label | UI says "Gemini API Key"; backend-js stores Kimi key in `gemini_api_key` |
 
-### Cutover / backend-js
+### backend-js
 
 | Limitation | Detail |
 | ---------- | ------ |
-| Fresh MongoDB seed (ADR-001) | v1 cutover does **not** import SQLite `intheflow.db` — back up before switching; re-sync planning markdown after cutover |
-| Python launcher | **`start.bat` starts backend-js** (default since cutover). Use `start-python.bat` for legacy FastAPI |
+| Fresh MongoDB seed (ADR-001) | v1 does **not** import legacy data — re-sync planning markdown after setup |
+| Python backend removed | The legacy Python/FastAPI/SQLite backend (`backend/`) has been **removed entirely**. Only `backend-js` (Express + Emmett + MongoDB) is supported |
 | MongoDB required | backend-js fails fast without `MONGODB_URI`, `.mongo-key`, or `MONGO_KEY_PATH` |
 
 ### Infrastructure
 
 | Limitation | Detail |
 | ---------- | ------ |
-| CORS wide open | `allow_origins=["*"]` — acceptable for local desktop, not production-hardened |
-| SQLite FK not enforced (Python) | DailyTask cascade and EAV deletes are application-level |
+| CORS wide open | `cors({ origin: "*" })` — acceptable for local desktop, not production-hardened |
 | No auth | API has no authentication — localhost trust model |
 | Electron does not spawn backend | API must be started separately (`start.bat` → backend-js, or manual `pnpm dev`) |
 
@@ -67,7 +66,7 @@ This document records **intentional v1 deferrals**, **documentation drift**, and
 
 ### Reference vs Specs folder
 
-Historical specs live in [Specs/](Specs/). Known divergences from live code:
+Historical specs were previously maintained in a `Specs/` subdirectory (now removed). Known divergences from live code:
 
 | Spec topic | Drift |
 | ---------- | ----- |
@@ -116,8 +115,8 @@ Light mode is functional for daily calendar workflow but not pixel-perfect acros
 
 | Caveat | Impact |
 | ------ | ------ |
-| View engine reads EAV | Kanban/views read Mongo `database_records`, not task streams directly. After DB wipe, run `pnpm backfill:task-records`. Python legacy: direct SQLite edits without sync leave views stale |
-| Project create EAV sync | **Fixed in backend-js** — `projectSideEffects.onProjectCreated` creates Projects Workspace `DatabaseRecord`; Python legacy still lacks this |
+| View engine reads EAV | Kanban/views read Mongo `database_records`, not task streams directly. After DB wipe, run `backend-js/scripts/backfill-task-records.ts` |
+| Project create EAV sync | `projectSideEffects.onProjectCreated` creates Projects Workspace `DatabaseRecord` on project creation |
 | Formula evaluation uses `eval()` | Query engine formula properties have sanitized eval — complex formulas may fail silently |
 
 ---
@@ -136,7 +135,7 @@ Light mode is functional for daily calendar workflow but not pixel-perfect acros
 
 ## Testing Gaps
 
-Per feature-creation config, automated tests were not required for Weekly Plan Calendar v1. Backend has `test_router_behavior.py` for some router checks; no frontend test suite.
+Per feature-creation config, automated tests were not required for Weekly Plan Calendar v1. No frontend test suite exists.
 
 ---
 
@@ -144,4 +143,4 @@ Per feature-creation config, automated tests were not required for Weekly Plan C
 
 - [06-Weekly-Plan-Calendar.md](06-Weekly-Plan-Calendar.md) — Feature reference
 - Feature success criteria - Explicit out-of-scope list
-- [Specs/](Specs/) — Historical planning documents
+

@@ -1,17 +1,14 @@
-import { KimiService } from "@/ai/KimiService.js";
+import { createAiService } from "@/ai/aiConfig.js";
 import type { ParsedWeeklyTask } from "@/settings/syncPlanning/parseWeeklyPlan.js";
+import type { SettingsDocument } from "@/settings/projections/settingsProjection.js";
 
 /**
  * AI weekly plan parsing fallback when regex parser yields zero tasks.
- *
- * @param content - Full planning markdown file content.
- * @param apiKey - Resolved Kimi API key from settings or env.
- * @returns Parsed tasks from Kimi, or empty list when unconfigured.
  */
 export async function parseWeeklyPlanAi(
   content: string,
-  apiKey: string,
+  settings: SettingsDocument = {},
 ): Promise<{ tasks: ParsedWeeklyTask[] }> {
-  const service = new KimiService(apiKey);
+  const service = createAiService(settings);
   return service.parseWeeklyPlanAi(content);
 }

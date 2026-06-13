@@ -15,6 +15,12 @@ describe("resolveMongoUri", () => {
     expect(() => resolveMongoUri()).toThrow(MONGO_SETUP_MESSAGE);
   });
 
+  it("uses MONGO_URI when MONGODB_URI is unset", () => {
+    delete process.env.MONGODB_URI;
+    process.env.MONGO_URI = "mongodb://localhost:27018";
+    expect(resolveMongoUri()).toBe("mongodb://localhost:27018");
+  });
+
   it("uses MONGODB_URI when set", () => {
     process.env.MONGODB_URI = "mongodb://localhost:27017";
     expect(resolveMongoUri()).toBe("mongodb://localhost:27017");

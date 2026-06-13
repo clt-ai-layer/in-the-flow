@@ -4,8 +4,8 @@ import type { MongoDBEventStore } from "@event-driven-io/emmett-mongodb";
 import { asyncHandler } from "@/platform/fastApiErrorMiddleware.js";
 import { stripReadModelListMetadata } from "@/platform/readModelUtils.js";
 import { appendAiLog } from "@/ai/AiLogRepository.js";
-import { getKimiApiKey } from "@/ai/keyResolution.js";
-import { KimiInvalidJsonError, KimiService } from "@/ai/KimiService.js";
+import { createAiService } from "@/ai/aiConfig.js";
+import { AiInvalidJsonError } from "@/ai/aiTypes.js";
 import { loadAllPlanningMarkdown, loadEnhanceTicketContext } from "@/ai/planningFiles.js";
 import { PROJECT_LIST_PROJECTION_NAME } from "@/project/projections/projectListProjection.js";
 import { Project } from "@/project/domain/Project.js";
@@ -73,8 +73,7 @@ export function registerAiRoutes(
     asyncHandler(async (req, res) => {
       const body = req.body as ClassifyRequestBody;
       const settings = await loadSettingsMap(eventStore);
-      const apiKey = getKimiApiKey(settings);
-      const service = new KimiService(apiKey);
+      const service = createAiService(settings);
 
       const projects = stripReadModelListMetadata(
         await eventStore.projections.inline.find<{ id: string; name: string }>(
@@ -110,13 +109,13 @@ export function registerAiRoutes(
         res.json(result);
       } catch (error) {
         const detail =
-          error instanceof KimiInvalidJsonError
+          error instanceof AiInvalidJsonError
             ? error.detail
             : error instanceof Error
               ? error.message
               : "Internal server error";
 
-        await logAiCall("classify_task", promptStr, { detail }, 0, "kimi-k2.6", detail);
+        await logAiCall("classify_task", promptStr, { detail }, 0, service.model, detail);
 
         const httpError = new Error(detail);
         (httpError as Error & { status: number }).status = 500;
@@ -129,8 +128,7 @@ export function registerAiRoutes(
     "/weekly-plan",
     asyncHandler(async (req, res) => {
       const settings = await loadSettingsMap(eventStore);
-      const apiKey = getKimiApiKey(settings);
-      const service = new KimiService(apiKey);
+      const service = createAiService(settings);
       const planningPath = resolvePlanningPath(settings);
       const planningContext = loadAllPlanningMarkdown(planningPath);
       const prompt = "Loaded planning folder md files";
@@ -147,13 +145,13 @@ export function registerAiRoutes(
         res.json(result);
       } catch (error) {
         const detail =
-          error instanceof KimiInvalidJsonError
+          error instanceof AiInvalidJsonError
             ? error.detail
             : error instanceof Error
               ? error.message
               : "Internal server error";
 
-        await logAiCall("weekly_plan_compilation", prompt, { detail }, 0, "kimi-k2.6", detail);
+        await logAiCall("weekly_plan_compilation", prompt, { detail }, 0, service.model, detail);
 
         const httpError = new Error(detail);
         (httpError as Error & { status: number }).status = 500;
@@ -166,8 +164,7 @@ export function registerAiRoutes(
     "/flow-analyzer",
     asyncHandler(async (req, res) => {
       const settings = await loadSettingsMap(eventStore);
-      const apiKey = getKimiApiKey(settings);
-      const service = new KimiService(apiKey);
+      const service = createAiService(settings);
 
       const activeTasks = stripReadModelListMetadata(
         await eventStore.projections.inline.find<TaskListDocument>(
@@ -197,13 +194,13 @@ export function registerAiRoutes(
         res.json(result);
       } catch (error) {
         const detail =
-          error instanceof KimiInvalidJsonError
+          error instanceof AiInvalidJsonError
             ? error.detail
             : error instanceof Error
               ? error.message
               : "Internal server error";
 
-        await logAiCall("flow_blocker_diagnosis", prompt, { detail }, 0, "kimi-k2.6", detail);
+        await logAiCall("flow_blocker_diagnosis", prompt, { detail }, 0, service.model, detail);
 
         const httpError = new Error(detail);
         (httpError as Error & { status: number }).status = 500;
@@ -217,8 +214,7 @@ export function registerAiRoutes(
     asyncHandler(async (req, res) => {
       const body = req.body as EnhanceRequestBody;
       const settings = await loadSettingsMap(eventStore);
-      const apiKey = getKimiApiKey(settings);
-      const service = new KimiService(apiKey);
+      const service = createAiService(settings);
       const planningPath = resolvePlanningPath(settings);
       const contextStr = loadEnhanceTicketContext(planningPath);
       const prompt = `Enhance: ${body.name}`;
@@ -241,13 +237,13 @@ export function registerAiRoutes(
         res.json(result);
       } catch (error) {
         const detail =
-          error instanceof KimiInvalidJsonError
+          error instanceof AiInvalidJsonError
             ? error.detail
             : error instanceof Error
               ? error.message
               : "Internal server error";
 
-        await logAiCall("ticket_description_enhancement", prompt, { detail }, 0, "kimi-k2.6", detail);
+        await logAiCall("ticket_description_enhancement", prompt, { detail }, 0, service.model, detail);
 
         const httpError = new Error(detail);
         (httpError as Error & { status: number }).status = 500;

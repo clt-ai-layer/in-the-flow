@@ -16,8 +16,7 @@ InTheFlow is a **desktop productivity workspace** for project planning and execu
 
 The app is a standalone desktop application. It is **not** part of any DDD/CQRS backend framework.
 
-**Primary backend (default):** `backend-js` — Express, Emmett event sourcing, MongoDB.  
-**Legacy backend:** `backend` — FastAPI, SQLModel, SQLite (via `start-python.bat`).
+**Primary backend (default):** `backend-js` — Express, Emmett event sourcing, MongoDB.
 
 ## How to Run
 
@@ -43,14 +42,12 @@ This script:
 | Install deps | `pnpm install` | project root |
 | Frontend dev server | `pnpm dev` | Vite on port 5173 |
 | **Primary API** | `pnpm dev` | `backend-js/` |
-| Legacy Python API | `venv\Scripts\python -m uvicorn main:app --port 8000 --reload` | `backend/` |
 | Electron (dev) | `NODE_ENV=development pnpm start` | Loads `http://localhost:5173` |
 
 ### Other launchers
 
 | File | Purpose |
 | ---- | ------- |
-| `start-python.bat` | Legacy FastAPI + SQLite backend on `:8000` |
 | `InTheFlow.vbs` | Silent Windows launcher |
 
 ## Directory Layout
@@ -58,19 +55,14 @@ This script:
 ```
 .
 ├── start.bat                 # Default launcher (backend-js + Electron)
-├── start-python.bat          # Legacy Python backend launcher
 ├── package.json              # Electron + Vite + React
 ├── backend-js/               # PRIMARY — Emmett + MongoDB API (:8000)
 │   ├── src/index.ts          # Express entry, seed phases, routes
 │   ├── src/task/             # Task aggregate, bulk-sync
 │   ├── src/dailyTask/        # DailyTask aggregate
 │   ├── src/views/            # EAV QueryEngine, view execute
-│   ├── src/integration/      # taskSideEffects → EAV + daily parent sync
-│   └── scripts/              # backfill-task-records.ts, etc.
-├── backend/                  # LEGACY — FastAPI + SQLite
-│   ├── main.py               # FastAPI entry
-│   ├── database.py           # SQLModel, sync_task_to_record
-│   └── routers/              # tasks, daily_tasks, views, ai, settings
+│   ├── src/task/integration/ # TaskIntegrationHandler → EAV + daily parent sync
+│   └── es-kit/               # Event sourcing utilities
 ├── frontend/
 │   ├── electron.js           # Electron main process
 │   └── src/
@@ -105,13 +97,6 @@ On first run, backend-js seeds four workspace views against "Tasks Workspace":
 | Archived Tasks History | `table` | — | Archived tasks only |
 
 Users can create additional custom views (board or table layout) via the **+** button in the workspace views section.
-
-## Reference vs Specs
-
-| Folder | Purpose |
-| ------ | ------- |
-| **This folder** (`docs/reference/`) | Authoritative documentation of **live code as it exists today** |
-| **[Specs/](Specs/)** | Historical planning-era specifications; may drift from implementation |
 
 When in doubt, trust the reference docs and verify against the source code.
 

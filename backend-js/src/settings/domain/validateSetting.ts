@@ -56,6 +56,12 @@ export function validateSettingValue(key: string, value: string): void {
       }
       break;
 
+    case "ai_provider":
+      if (!["kimi", "gemini"].includes(value.trim().toLowerCase())) {
+        throw new ValidationError("ai_provider must be 'kimi' or 'gemini'.");
+      }
+      break;
+
     case "gemini_api_key":
     case "GEMINI_API_KEY":
     case "kimi_api_key":

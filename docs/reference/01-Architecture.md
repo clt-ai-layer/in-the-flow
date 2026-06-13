@@ -6,7 +6,7 @@
 
 ## System Overview
 
-InTheFlow is a **dual-process desktop application** (Electron renderer + separate API server). The API is migrating from Python/SQLite to **backend-js** (Express + Emmett event sourcing + MongoDB). Post-cutover primary: [`backend-js/`](../../backend-js/). Legacy Python remains at [`backend/`](../../backend/) until acceptance sign-off.
+InTheFlow is a **dual-process desktop application** (Electron renderer + separate API server). The backend is **backend-js** (Express + Emmett event sourcing + MongoDB). Source: [`backend-js/`](../../backend-js/).
 
 ```mermaid
 flowchart TB
@@ -39,8 +39,6 @@ flowchart TB
 | UI | React 18 + Vite 5 | `frontend/src/main.jsx` |
 | API (primary) | Express + Emmett | `backend-js/src/index.ts` |
 | Persistence (primary) | MongoDB event store | `intheflow_dev` / `intheflow_test` |
-| API (legacy) | FastAPI + SQLModel | `backend/main.py` |
-| Persistence (legacy) | SQLite (WAL mode) | `backend/intheflow.db` |
 
 ## Startup Lifecycle
 
@@ -50,12 +48,12 @@ flowchart TB
 sequenceDiagram
     participant BAT as start.bat
     participant Vite as pnpm build
-    participant API as uvicorn
+    participant API as backend-js
     participant EL as Electron
 
     BAT->>Vite: Build frontend to dist/
     BAT->>API: Start backend (background)
-    Note over API: create_db_and_tables() on startup
+    Note over API: Emmett seed phases on startup
     BAT->>BAT: timeout 3s
     BAT->>EL: pnpm start
     EL->>EL: loadFile(dist/index.html)
@@ -66,23 +64,10 @@ sequenceDiagram
 When `NODE_ENV=development`:
 
 - Electron loads `http://localhost:5173` (Vite dev server)
-- Backend is **not** spawned by Electron — start `backend-js` (`pnpm dev`) or Python (`start.bat` / uvicorn) manually
+- Backend is **not** spawned by Electron — start `backend-js` (`pnpm dev`) or via `start.bat` manually
 - DevTools open automatically
 
 In production mode, `electron.js` may spawn a **Vite preview** subprocess on `:4173` only — never the API backend.
-
-### Backend startup (`main.py`)
-
-On `@app.on_event("startup")`:
-
-1. `create_db_and_tables()` — creates SQLModel tables if missing
-2. Sets SQLite `PRAGMA journal_mode=WAL`
-3. Runs `seed_database()` — projects, tasks from JSON, EAV migration if empty
-
-Environment variables load from:
-
-- `backend/.env`
-- `.env`
 
 ## IPC Bridge
 
@@ -105,7 +90,6 @@ Electron uses **context isolation** with a preload script.
 **Electron does not spawn the API backend.** `electron.js` only manages the BrowserWindow and optional Vite preview server. Start the backend separately:
 
 - **Default (`start.bat`)**: `backend-js` (`pnpm dev`) on `:8000`, then Electron
-- **Legacy (`start-python.bat`)**: Python uvicorn on `:8000`, then Electron
 
 ## HTTP Client (`api.js`)
 
@@ -113,7 +97,7 @@ All frontend data access goes through `frontend/src/api.js`:
 
 - **Base URL**: `http://localhost:8000/api`
 - **Transport**: `fetch` with JSON bodies
-- **Error handling**: Parses `detail` from FastAPI error responses
+- **Error handling**: Parses `detail` from error responses (FastAPI-compatible format)
 
 Namespaces: `tasks`, `dailyTasks`, `projects`, `settings`, `ai`, `views`.
 
@@ -171,20 +155,18 @@ Tasks are the source of truth in event streams; Kanban/views read **EAV `databas
 ```mermaid
 flowchart LR
     TaskCRUD[task routes / bulk-sync] --> Streams[(Task event stream)]
-    TaskCRUD --> SideFX[taskSideEffects]
+    TaskCRUD --> SideFX[TaskIntegrationHandler]
     SideFX --> EAV[(database_records Mongo)]
     SideFX --> Daily[syncDailyTaskParentFields]
     Views[POST /views/execute] --> QE[QueryEngine]
     QE --> EAV
 ```
 
-**Python (legacy):** `sync_task_to_record()` on SQLite `DatabaseRecord` after each task CRUD.
-
-Kanban/Backlog dynamic views read EAV via `QueryEngine`, not directly from task projections. After a Mongo wipe, run `pnpm backfill:task-records`.
+Kanban/Backlog dynamic views read EAV via `QueryEngine`, not directly from task projections. After a Mongo wipe, run the EAV backfill (see `backend-js/scripts/backfill-task-records.ts`).
 
 ## CORS
 
-FastAPI allows all origins (`allow_origins=["*"]`) for Electron dev server compatibility. Production should restrict to localhost.
+Express allows all origins (`cors({ origin: "*" })`) for Electron dev server compatibility. Production should restrict to localhost.
 
 ## Key Source Paths
 
@@ -192,9 +174,7 @@ FastAPI allows all origins (`allow_origins=["*"]`) for Electron dev server compa
 | ------- | ---- |
 | App root state | `frontend/src/App.jsx` |
 | API client | `frontend/src/api.js` |
-| Database models | `backend/database.py` |
-| Query engine (primary) | `backend-js/src/views/queryEngine/QueryEngine.ts` |
-| Task side effects | `backend-js/src/integration/taskSideEffects.ts` |
-| Legacy query engine | `backend/services/query_engine.py` |
+| Query engine | `backend-js/src/views/queryEngine/QueryEngine.ts` |
+| Task integration handler | `backend-js/src/task/integration/TaskIntegrationHandler.ts` |
 | Electron main | `frontend/electron.js` |
 | Theme boot | `frontend/index.html`, `frontend/src/utils/theme.js` |
