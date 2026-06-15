@@ -12,7 +12,9 @@
     "test": "vitest run",
     "test:json": "vitest run --reporter=json",
     "test:golden": "vitest run test/golden",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "seed:dry": "tsx scripts/seed.ts --dry-run",
+    "seed:custom": "tsx scripts/seed.ts --file"
   },
   "dependencies": {
     "@event-driven-io/emmett": "0.42.3",

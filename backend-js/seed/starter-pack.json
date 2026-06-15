@@ -1,0 +1,202 @@
+{
+  "projects": [
+    {
+      "name": "Product Launch",
+      "description": "Q3 product launch planning and execution",
+      "color": "#3B82F6"
+    },
+    {
+      "name": "Technical Foundation",
+      "description": "Infrastructure, CI/CD, and developer tooling",
+      "color": "#10B981"
+    },
+    {
+      "name": "Growth & Marketing",
+      "description": "User acquisition, content, and community",
+      "color": "#F59E0B"
+    }
+  ],
+
+  "tasks": [
+    {
+      "name": "Define product roadmap for Q3",
+      "status": "in_progress",
+      "category": "feature",
+      "source": "planning",
+      "task_grouping": "ProductivityAgents",
+      "owner": "Alice",
+      "estimated_duration": 120,
+      "project": "Product Launch"
+    },
+    {
+      "name": "Draft user onboarding flow wireframes",
+      "status": "ready_to_start",
+      "category": "feature",
+      "source": "planning",
+      "task_grouping": "Frontend",
+      "owner": "Alice",
+      "estimated_duration": 90,
+      "project": "Product Launch"
+    },
+    {
+      "name": "Research competitor pricing models",
+      "status": "backlog",
+      "category": "research",
+      "source": "planning",
+      "task_grouping": "General",
+      "owner": "Bob",
+      "estimated_duration": 60,
+      "project": "Growth & Marketing"
+    },
+    {
+      "name": "Prepare investor pitch deck",
+      "status": "on_hold",
+      "category": "feature",
+      "source": "planning",
+      "task_grouping": "General",
+      "owner": "Alice",
+      "estimated_duration": 180,
+      "project": "Growth & Marketing"
+    },
+    {
+      "name": "Create marketing landing page copy",
+      "status": "done",
+      "category": "improvement",
+      "source": "planning",
+      "task_grouping": "Frontend",
+      "owner": "Alice",
+      "estimated_duration": 45,
+      "project": "Growth & Marketing"
+    },
+    {
+      "name": "Set up CI/CD pipeline with GitHub Actions",
+      "status": "in_progress",
+      "category": "improvement",
+      "source": "planning",
+      "task_grouping": "Infrastructure",
+      "owner": "Bob",
+      "estimated_duration": 120,
+      "project": "Technical Foundation"
+    },
+    {
+      "name": "Implement user authentication with OAuth2",
+      "status": "ready_to_start",
+      "category": "feature",
+      "source": "planning",
+      "task_grouping": "Backend",
+      "owner": "Alice",
+      "estimated_duration": 240,
+      "project": "Technical Foundation"
+    },
+    {
+      "name": "Fix pagination bug on task list endpoint",
+      "status": "in_progress",
+      "category": "bug",
+      "source": "planning",
+      "task_grouping": "Backend",
+      "owner": "Bob",
+      "estimated_duration": 30,
+      "project": "Technical Foundation"
+    },
+    {
+      "name": "Add database migration tooling for schema changes",
+      "status": "backlog",
+      "category": "improvement",
+      "source": "planning",
+      "task_grouping": "Infrastructure",
+      "owner": "Bob",
+      "estimated_duration": 90,
+      "project": "Technical Foundation"
+    },
+    {
+      "name": "Write integration tests for REST API endpoints",
+      "status": "ready_to_start",
+      "category": "feature",
+      "source": "planning",
+      "task_grouping": "Backend",
+      "owner": "Alice",
+      "estimated_duration": 120,
+      "project": "Technical Foundation"
+    },
+    {
+      "name": "Design system component library v1",
+      "status": "in_progress",
+      "category": "feature",
+      "source": "planning",
+      "task_grouping": "Frontend",
+      "owner": "Alice",
+      "estimated_duration": 180,
+      "project": "Product Launch"
+    },
+    {
+      "name": "Set up error monitoring with Sentry",
+      "status": "backlog",
+      "category": "improvement",
+      "source": "planning",
+      "task_grouping": "Infrastructure",
+      "owner": "Bob",
+      "estimated_duration": 60,
+      "project": "Technical Foundation"
+    },
+    {
+      "name": "Write SEO blog posts for launch",
+      "status": "ready_to_start",
+      "category": "feature",
+      "source": "planning",
+      "task_grouping": "SocialMedia",
+      "owner": "Alice",
+      "estimated_duration": 90,
+      "project": "Growth & Marketing"
+    },
+    {
+      "name": "Configure A/B testing framework",
+      "status": "backlog",
+      "category": "feature",
+      "source": "planning",
+      "task_grouping": "Frontend",
+      "owner": "Bob",
+      "estimated_duration": 120,
+      "project": "Product Launch"
+    },
+    {
+      "name": "API rate limiting and throttling",
+      "status": "ready_to_start",
+      "category": "improvement",
+      "source": "planning",
+      "task_grouping": "Backend",
+      "owner": "Bob",
+      "estimated_duration": 60,
+      "project": "Technical Foundation"
+    }
+  ],
+
+  "daily_tasks": [
+    {
+      "date_offset": 0,
+      "blocks": [
+        { "start_time": "09:00", "end_time": "10:30", "task_name": "Define product roadmap for Q3", "owner": "Alice" },
+        { "start_time": "10:45", "end_time": "12:00", "task_name": "Design system component library v1", "owner": "Alice" },
+        { "start_time": "13:00", "end_time": "14:30", "task_name": "Fix pagination bug on task list endpoint", "owner": "Bob" },
+        { "start_time": "14:45", "end_time": "16:00", "task_name": "Set up CI/CD pipeline with GitHub Actions", "owner": "Bob" }
+      ]
+    },
+    {
+      "date_offset": 1,
+      "blocks": [
+        { "start_time": "09:00", "end_time": "11:00", "task_name": "Implement user authentication with OAuth2", "owner": "Alice" },
+        { "start_time": "11:15", "end_time": "12:00", "task_name": "Write integration tests for REST API endpoints", "owner": "Alice" },
+        { "start_time": "13:00", "end_time": "14:00", "task_name": "Research competitor pricing models", "owner": "Bob" },
+        { "start_time": "14:15", "end_time": "16:00", "task_name": "Add database migration tooling for schema changes", "owner": "Bob" }
+      ]
+    },
+    {
+      "date_offset": 2,
+      "blocks": [
+        { "start_time": "09:00", "end_time": "10:00", "task_name": "Draft user onboarding flow wireframes", "owner": "Alice" },
+        { "start_time": "10:15", "end_time": "12:00", "task_name": "Write SEO blog posts for launch", "owner": "Alice" },
+        { "start_time": "13:00", "end_time": "15:00", "task_name": "API rate limiting and throttling", "owner": "Bob" },
+        { "start_time": "15:15", "end_time": "16:30", "task_name": "Set up error monitoring with Sentry", "owner": "Bob" }
+      ]
+    }
+  ]
+}

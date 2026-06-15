@@ -1,4 +1,4 @@
-export const DEFAULT_PLANNING_DIR = "";
+export const DEFAULT_PLANNING_DIR = "~/Documents/InTheFlow/planning";
 
 export const SYNC_HASH_SETTING_KEY = "sync_active_file_hash";
 export const PLANNING_FOLDER_SETTING_KEY = "planning_folder_path";
