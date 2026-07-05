@@ -76,6 +76,21 @@ export default function App() {
     refreshData();
   }, [currentView]);
 
+  // Keyboard shortcuts: Alt+1 = Dashboard, Alt+2 = AI Hub, Alt+3 = Calendar, Alt+0 = Settings
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!e.altKey || e.ctrlKey || e.metaKey) return;
+      const map = { '1': 'dashboard', '2': 'ai-hub', '3': 'calendar', '0': 'settings' };
+      const target = map[e.key];
+      if (target) {
+        e.preventDefault();
+        setCurrentView(target);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   useEffect(() => {
     async function loadAndReconcileTheme() {
       try {

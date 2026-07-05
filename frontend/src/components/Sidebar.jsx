@@ -1,5 +1,18 @@
 import React from 'react';
-import { LayoutDashboard, CalendarDays, KanbanSquare, FolderKanban, BrainCircuit, Settings, RefreshCw, Plus } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, KanbanSquare, FolderKanban, BrainCircuit, Settings, RefreshCw, Plus, Keyboard } from 'lucide-react';
+
+const KBD_STYLE = {
+  fontSize: '10px',
+  fontFamily: 'monospace',
+  color: 'var(--text-muted)',
+  background: 'var(--nav-active-bg)',
+  borderRadius: '4px',
+  padding: '2px 5px',
+  marginLeft: 'auto',
+  opacity: 0.7,
+  border: '1px solid var(--glass-border)',
+  lineHeight: 1,
+};
 
 export default function Sidebar({ currentView, onViewChange, onSyncPlanning, isSyncing, planningSyncEnabled = false, onRefresh, isRefreshing, views = [] }) {
   return (
@@ -78,6 +91,7 @@ export default function Sidebar({ currentView, onViewChange, onSyncPlanning, isS
         >
           <LayoutDashboard size={18} style={{ color: currentView === 'dashboard' ? 'var(--accent-cyan)' : 'var(--text-secondary)' }} />
           Dashboard
+          <span style={KBD_STYLE}>Alt+1</span>
         </button>
 
         <button
@@ -103,6 +117,7 @@ export default function Sidebar({ currentView, onViewChange, onSyncPlanning, isS
         >
           <BrainCircuit size={18} style={{ color: currentView === 'ai-hub' ? 'var(--accent-cyan)' : 'var(--text-secondary)' }} />
           AI Flow Hub
+          <span style={KBD_STYLE}>Alt+2</span>
         </button>
 
         <button
@@ -128,6 +143,7 @@ export default function Sidebar({ currentView, onViewChange, onSyncPlanning, isS
         >
           <CalendarDays size={18} style={{ color: currentView === 'calendar' ? 'var(--accent-cyan)' : 'var(--text-secondary)' }} />
           Calendar
+          <span style={KBD_STYLE}>Alt+3</span>
         </button>
 
         {/* Dynamic Views Section */}
@@ -200,6 +216,7 @@ export default function Sidebar({ currentView, onViewChange, onSyncPlanning, isS
         >
           <Settings size={18} style={{ color: currentView === 'settings' ? 'var(--accent-cyan)' : 'var(--text-secondary)' }} />
           Settings
+          <span style={KBD_STYLE}>Alt+0</span>
         </button>
       </nav>
 
